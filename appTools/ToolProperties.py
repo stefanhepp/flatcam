@@ -466,15 +466,15 @@ class Properties(AppTool):
                     self.treeWidget.addChild(tool_data, [str(data_k).capitalize(), str(data_v)], True)
 
             # for cncjob objects made from excellon
-            for tool_dia, value in obj.exc_cnc_tools.items():
+            for tool_key, value in obj.exc_cnc_tools.items():
                 exc_tool = self.treeWidget.addParent(
-                    tools, str(value['tool']), expanded=False, color=p_color, font=font
+                    tools, str(tool_key), expanded=False, color=p_color, font=font
                 )
                 self.treeWidget.addChild(
                     exc_tool,
                     [
                         _('Diameter'),
-                        '%.*f %s' % (self.decimals, tool_dia, self.app.defaults['units'].lower())
+                        '%.*f %s' % (self.decimals, value['tooldia'], self.app.defaults['units'].lower())
                     ],
                     True
                 )

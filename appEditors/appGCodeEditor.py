@@ -159,7 +159,7 @@ class AppGCodeEditor(QtCore.QObject):
             tool_idx += 1
             row_no += 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
+            t_id = QtWidgets.QTableWidgetItem('%d' % int(dia_key))
             # id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.cnc_tools_table.setItem(row_no, 0, t_id)  # Tool name/id
 
@@ -251,8 +251,8 @@ class AppGCodeEditor(QtCore.QObject):
             tool_idx += 1
             row_no += 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
-            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(tooldia_key)))
+            t_id = QtWidgets.QTableWidgetItem('%d' % int(tooldia_key))
+            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(dia_value['tooldia'])))
             nr_drills_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_drills']))
             nr_slots_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_slots']))
             cutz_item = QtWidgets.QTableWidgetItem('%.*f' % (
@@ -419,12 +419,7 @@ class AppGCodeEditor(QtCore.QObject):
                 if self.gcode_obj.cnc_tools:
                     text_to_be_found = self.gcode_obj.cnc_tools[tool_no]['gcode']
                 elif self.gcode_obj.exc_cnc_tools:
-                    tool_dia = self.app.dec_format(float(t_table.item(row, 1).text()), dec=self.decimals)
-                    for tool_d in self.gcode_obj.exc_cnc_tools:
-                        if self.app.dec_format(tool_d, dec=self.decimals) == tool_dia:
-                            text_to_be_found = self.gcode_obj.exc_cnc_tools[tool_d]['gcode']
-                    if text_to_be_found is None:
-                        continue
+                    text_to_be_found = self.gcode_obj.exc_cnc_tools[tool_no]['gcode']
                 else:
                     continue
 

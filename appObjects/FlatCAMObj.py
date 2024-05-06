@@ -777,7 +777,7 @@ class FlatCAMObj(QtCore.QObject):
                     self.treeWidget.addChild(tool_data, [str(data_k).capitalize(), str(data_v)], True)
 
             # for cncjob objects made from excellon
-            for tool_dia, value in obj.exc_cnc_tools.items():
+            for tool_key, value in obj.exc_cnc_tools.items():
                 exc_tool = self.treeWidget.addParent(
                     tools, str(value['tool']), expanded=False, color=p_color, font=font
                 )
@@ -785,7 +785,7 @@ class FlatCAMObj(QtCore.QObject):
                     exc_tool,
                     [
                         _('Diameter'),
-                        '%.*f %s' % (self.decimals, float(tool_dia), self.app.defaults['units'].lower())
+                        '%.*f %s' % (self.decimals, float(value['tooldia']), self.app.defaults['units'].lower())
                     ],
                     True
                 )

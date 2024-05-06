@@ -270,7 +270,7 @@ class CNCJobObject(FlatCAMObj, CNCjob):
             tool_idx += 1
             row_no = tool_idx - 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
+            t_id = QtWidgets.QTableWidgetItem('%d' % int(dia_key))
             # id.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.ui.cnc_tools_table.setItem(row_no, 0, t_id)  # Tool name/id
 
@@ -363,13 +363,13 @@ class CNCJobObject(FlatCAMObj, CNCjob):
         n = len(self.exc_cnc_tools)
         self.ui.exc_cnc_tools_table.setRowCount(n)
 
-        for tooldia_key, dia_value in self.exc_cnc_tools.items():
+        for dia_key, dia_value in self.exc_cnc_tools.items():
 
             tool_idx += 1
             row_no = tool_idx - 1
 
-            t_id = QtWidgets.QTableWidgetItem('%d' % int(tool_idx))
-            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(tooldia_key)))
+            t_id = QtWidgets.QTableWidgetItem('%d' % int(dia_key))
+            dia_item = QtWidgets.QTableWidgetItem('%.*f' % (self.decimals, float(dia_value['tooldia'])))
             nr_drills_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_drills']))
             nr_slots_item = QtWidgets.QTableWidgetItem('%d' % int(dia_value['nr_slots']))
             try:
@@ -398,7 +398,7 @@ class CNCJobObject(FlatCAMObj, CNCjob):
 
             plot_item = FCCheckBox()
             plot_item.setLayoutDirection(QtCore.Qt.RightToLeft)
-            tool_uid_item = QtWidgets.QTableWidgetItem(str(dia_value['tool']))
+            tool_uid_item = QtWidgets.QTableWidgetItem(str(dia_key))
             if self.ui.plot_cb.isChecked():
                 plot_item.setChecked(True)
 
@@ -2240,9 +2240,9 @@ class CNCJobObject(FlatCAMObj, CNCjob):
                             hpgl = True
                             break
             elif self.exc_cnc_tools:
-                for key in self.cnc_tools:
-                    if 'ppname_e' in self.cnc_tools[key]['data']:
-                        if 'hpgl' in self.cnc_tools[key]['data']['ppname_e']:
+                for key in self.exc_cnc_tools:
+                    if 'ppname_e' in self.exc_cnc_tools[key]['data']:
+                        if 'hpgl' in self.exc_cnc_tools[key]['data']['ppname_e']:
                             hpgl = True
                             break
 
@@ -2426,7 +2426,7 @@ class CNCJobObject(FlatCAMObj, CNCjob):
             for r in range(self.ui.exc_cnc_tools_table.rowCount()):
                 row_dia = float('%.*f' % (self.decimals, float(self.ui.exc_cnc_tools_table.item(r, 1).text())))
                 for tooluid_key in self.exc_cnc_tools:
-                    tooldia = float('%.*f' % (self.decimals, float(tooluid_key)))
+                    tooldia = float('%.*f' % (self.decimals, float(self.exc_cnc_tools[tooluid_key]['tooldia'])))
                     if row_dia == tooldia:
                         gcode_parsed = self.exc_cnc_tools[tooluid_key]['gcode_parsed']
                         if self.ui.exc_cnc_tools_table.cellWidget(r, 6).isChecked():
@@ -2489,7 +2489,7 @@ class CNCJobObject(FlatCAMObj, CNCjob):
                 if self.origin_kind == "excellon":
                     if self.exc_cnc_tools:
                         for tooldia_key in self.exc_cnc_tools:
-                            tooldia = float('%.*f' % (self.decimals, float(tooldia_key)))
+                            tooldia = float('%.*f' % (self.decimals, float(self.exc_cnc_tools[tooldia_key]['tooldia'])))
                             gcode_parsed = self.exc_cnc_tools[tooldia_key]['gcode_parsed']
                             if not gcode_parsed:
                                 continue

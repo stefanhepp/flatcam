@@ -473,31 +473,58 @@ class ToolDrilling(AppTool, Excellon):
         # the tools table changed therefore we need to rebuild it
         QtCore.QTimer.singleShot(20, self.build_tool_ui)
 
+    def merge_tools(self):
+        log.debug("ToolDrilling.merge_tools()")
+
+        # Maintain a list of all tools, with (tool_key, tool_merged?) pairs
+        all_tools = [{'tool': k, 'merged': False} for k in self.excellon_tools]
+        merged_tools = {}
+        for idx, value in enumerate(all_tools):
+            if value['merged']:
+                continue
+            # copy the current tool, merge any equivalent tools into this one
+            tool = value['tool']
+            merged_tools[tool] = deepcopy(self.excellon_tools[tool])
+            if idx+1 < len(all_tools):
+                for cmp_value in all_tools[idx+1:]:
+                    if cmp_value['merged']:
+                        continue
+                    cmp_tool = cmp_value['tool']
+                    # compare tools
+                    if self.excellon_tools[tool]['tooldia'] == self.excellon_tools[cmp_tool]['tooldia']:
+                        for key in ['solid_geometry', 'drills', 'slots']:
+                            if key in self.excellon_tools[cmp_tool]:
+                                if key not in merged_tools[tool]:
+                                    merged_tools[tool][key] = []
+                                merged_tools[tool][key].extend(self.excellon_tools[cmp_tool][key])
+                        cmp_value['merged'] = True
+
+        self.excellon_tools = merged_tools
+
     def build_tool_ui(self):
         log.debug("ToolDrilling.build_tool_ui()")
         self.ui_disconnect()
 
+        # merge any tools with same diameter
+        self.merge_tools()
+
         # order the tools by tool diameter if it's the case
-        sorted_tools = []
-        for k, v in self.excellon_tools.items():
-            sorted_tools.append(self.dec_format(float(v['tooldia'])))
+        all_tools = [(int(k), float(v['tooldia'])) for k, v in self.excellon_tools.items()]
 
         order = self.t_ui.order_radio.get_value()
         if order == 'fwd':
-            sorted_tools.sort(reverse=False)
+            sorted_tools = sorted(all_tools, key=lambda t1: t1[1], reverse=False)
         elif order == 'rev':
-            sorted_tools.sort(reverse=True)
+            sorted_tools = sorted(all_tools, key=lambda t1: t1[1], reverse=True)
         else:
-            pass
+            sorted_tools = all_tools
 
         # remake the excellon_tools dict in the order above
         new_id = 1
         new_tools = {}
-        for tooldia in sorted_tools:
-            for old_tool in self.excellon_tools:
-                if self.dec_format(float(self.excellon_tools[old_tool]['tooldia'])) == tooldia:
-                    new_tools[new_id] = deepcopy(self.excellon_tools[old_tool])
-                    new_id += 1
+        for old_tool, tooldia in sorted_tools:
+            new_tools[new_id] = deepcopy(self.excellon_tools[old_tool])
+            new_id += 1
 
         self.excellon_tools = new_tools
 
@@ -1730,15 +1757,15 @@ class ToolDrilling(AppTool, Excellon):
                         default_data['tools_drill_cutz'] = float(self.excellon_tools[it[0]]['data']['tools_drill_cutz'])
 
                         # populate the Excellon CNC tools storage
-                        job_obj.exc_cnc_tools[it[1]] = {}
-                        job_obj.exc_cnc_tools[it[1]]['tool'] = it[0]
-                        job_obj.exc_cnc_tools[it[1]]['nr_drills'] = drill_no
-                        job_obj.exc_cnc_tools[it[1]]['nr_slots'] = slot_no
-                        job_obj.exc_cnc_tools[it[1]]['offset'] = z_off
-                        job_obj.exc_cnc_tools[it[1]]['data'] = default_data
-                        job_obj.exc_cnc_tools[it[1]]['gcode'] = ''
-                        job_obj.exc_cnc_tools[it[1]]['gcode_parsed'] = []
-                        job_obj.exc_cnc_tools[it[1]]['solid_geometry'] = deepcopy(sol_geo)
+                        job_obj.exc_cnc_tools[it[0]] = {}
+                        job_obj.exc_cnc_tools[it[0]]['tooldia'] = it[1]
+                        job_obj.exc_cnc_tools[it[0]]['nr_drills'] = drill_no
+                        job_obj.exc_cnc_tools[it[0]]['nr_slots'] = slot_no
+                        job_obj.exc_cnc_tools[it[0]]['offset'] = z_off
+                        job_obj.exc_cnc_tools[it[0]]['data'] = default_data
+                        job_obj.exc_cnc_tools[it[0]]['gcode'] = ''
+                        job_obj.exc_cnc_tools[it[0]]['gcode_parsed'] = []
+                        job_obj.exc_cnc_tools[it[0]]['solid_geometry'] = deepcopy(sol_geo)
 
                         # build a self.options['Tools_in_use'] list from scratch if we don't have one like in the case
                         # of running this method from a Tcl Command
@@ -1783,7 +1810,7 @@ class ToolDrilling(AppTool, Excellon):
             x_tc, y_tc = [0, 0]
             try:
                 if job_obj.xy_toolchange != '':
-                    tcxy_temp = re.sub('[()\[\]]', '', str(job_obj.xy_toolchange))
+                    tcxy_temp = re.sub(r'[()\[\]]', '', str(job_obj.xy_toolchange))
                     if tcxy_temp:
                         x_tc, y_tc = [float(eval(a)) for a in tcxy_temp.split(",")]
             except Exception:
@@ -1817,10 +1844,10 @@ class ToolDrilling(AppTool, Excellon):
                 total_solid_geo = []
 
                 # calculate the total number of drills and of slots
-                for e_tool_dia in job_obj.exc_cnc_tools:
-                    nr_drills += int(job_obj.exc_cnc_tools[e_tool_dia]['nr_drills'])
-                    nr_slots += int(job_obj.exc_cnc_tools[e_tool_dia]['nr_slots'])
-                    total_solid_geo += job_obj.exc_cnc_tools[e_tool_dia]['solid_geometry']
+                for e_tool_key in job_obj.exc_cnc_tools:
+                    nr_drills += int(job_obj.exc_cnc_tools[e_tool_key]['nr_drills'])
+                    nr_slots += int(job_obj.exc_cnc_tools[e_tool_key]['nr_slots'])
+                    total_solid_geo += job_obj.exc_cnc_tools[e_tool_key]['solid_geometry']
 
                 tool_table_items.clear()
                 tool_table_items = [[str(used_tool), str(used_tooldia), str(nr_drills), str(nr_slots)]]
@@ -1841,16 +1868,16 @@ class ToolDrilling(AppTool, Excellon):
                                                                       start_pt=first_drill_point)
 
                 # store the results in Excellon CNC tools storage
-                job_obj.exc_cnc_tools[used_tooldia]['nr_drills'] = nr_drills
-                job_obj.exc_cnc_tools[used_tooldia]['nr_slots'] = nr_slots
-                job_obj.exc_cnc_tools[used_tooldia]['gcode'] = tool_gcode
-                job_obj.exc_cnc_tools[used_tooldia]['gcode_parsed'] = tool_gcode_parsed
-                job_obj.exc_cnc_tools[used_tooldia]['solid_geometry'] = total_solid_geo
+                job_obj.exc_cnc_tools[used_tool]['nr_drills'] = nr_drills
+                job_obj.exc_cnc_tools[used_tool]['nr_slots'] = nr_slots
+                job_obj.exc_cnc_tools[used_tool]['gcode'] = tool_gcode
+                job_obj.exc_cnc_tools[used_tool]['gcode_parsed'] = tool_gcode_parsed
+                job_obj.exc_cnc_tools[used_tool]['solid_geometry'] = total_solid_geo
 
                 # delete all tools from the Excellon CNC tools storage except the used one
-                for e_tool_dia in list(job_obj.exc_cnc_tools.keys()):
-                    if e_tool_dia != used_tooldia:
-                        job_obj.exc_cnc_tools.pop(e_tool_dia, None)
+                for e_tool_key in list(job_obj.exc_cnc_tools.keys()):
+                    if e_tool_key != used_tool:
+                        job_obj.exc_cnc_tools.pop(e_tool_key, None)
 
                 if start_gcode != '':
                     job_obj.gc_start = start_gcode
@@ -1869,12 +1896,11 @@ class ToolDrilling(AppTool, Excellon):
                     if convert_slots is True:
                         nr_drills = len(points[tool])
                         nr_slots = 0
-                        job_obj.exc_cnc_tools[used_tooldia]['nr_drills'] = nr_drills
-                        job_obj.exc_cnc_tools[used_tooldia]['nr_slots'] = nr_slots
+                        job_obj.exc_cnc_tools[tool]['nr_drills'] = nr_drills
+                        job_obj.exc_cnc_tools[tool]['nr_slots'] = nr_slots
 
                         for line in range(1, len(job_obj.options['Tools_in_use'])):
-                            if self.dec_format(float(job_obj.options['Tools_in_use'][line][1])) == \
-                                    self.dec_format(used_tooldia):
+                            if job_obj.options['Tools_in_use'][line][0] == str(tool):
                                 job_obj.options['Tools_in_use'][line][2] = str(nr_drills)
                                 job_obj.options['Tools_in_use'][line][3] = str(nr_slots)
 
@@ -1899,8 +1925,8 @@ class ToolDrilling(AppTool, Excellon):
                     first_drill_point = last_pt
 
                     # store the results of GCode generation and parsing
-                    job_obj.exc_cnc_tools[used_tooldia]['gcode'] = tool_gcode
-                    job_obj.exc_cnc_tools[used_tooldia]['gcode_parsed'] = tool_gcode_parsed
+                    job_obj.exc_cnc_tools[tool]['gcode'] = tool_gcode
+                    job_obj.exc_cnc_tools[tool]['gcode_parsed'] = tool_gcode_parsed
 
                     if start_gcode != '':
                         job_obj.gc_start = start_gcode
