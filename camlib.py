@@ -3208,7 +3208,7 @@ class CNCjob(Geometry):
                 self.xy_toolchange = None
             else:
                 # either originally it was a string or not, xy_toolchange will be made string
-                self.xy_toolchange = re.sub('[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
+                self.xy_toolchange = re.sub(r'[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
 
                 # and now, xy_toolchange is made into a list of floats in format [x, y]
                 if self.xy_toolchange:
@@ -3233,7 +3233,7 @@ class CNCjob(Geometry):
                 self.xy_end = None
             else:
                 # either originally it was a string or not, xy_end will be made string
-                self.xy_end = re.sub('[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
+                self.xy_end = re.sub(r'[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
 
                 # and now, xy_end is made into a list of floats in format [x, y]
                 if self.xy_end:
@@ -3618,7 +3618,7 @@ class CNCjob(Geometry):
                 self.xy_end = None
             else:
                 # either originally it was a string or not, xy_end will be made string
-                self.xy_end = re.sub('[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
+                self.xy_end = re.sub(r'[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
 
                 # and now, xy_end is made into a list of floats in format [x, y]
                 if self.xy_end:
@@ -3638,7 +3638,7 @@ class CNCjob(Geometry):
                 self.xy_toolchange = None
             else:
                 # either originally it was a string or not, xy_toolchange will be made string
-                self.xy_toolchange = re.sub('[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
+                self.xy_toolchange = re.sub(r'[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
 
                 # and now, xy_toolchange is made into a list of floats in format [x, y]
                 if self.xy_toolchange:
@@ -3873,7 +3873,7 @@ class CNCjob(Geometry):
             if self.xy_toolchange == '':
                 self.xy_toolchange = None
             else:
-                self.xy_toolchange = re.sub('[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
+                self.xy_toolchange = re.sub(r'[()\[\]]', '', str(self.xy_toolchange)) if self.xy_toolchange else None
 
                 if self.xy_toolchange:
                     self.xy_toolchange = [float(eval(a)) for a in self.xy_toolchange.split(",")]
@@ -3888,7 +3888,7 @@ class CNCjob(Geometry):
             pass
 
         # XY_end parameter
-        self.xy_end = re.sub('[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
+        self.xy_end = re.sub(r'[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
         if self.xy_end and self.xy_end != '':
             self.xy_end = [float(eval(a)) for a in self.xy_end.split(",")]
         if self.xy_end and len(self.xy_end) < 2:
@@ -5306,7 +5306,7 @@ class CNCjob(Geometry):
         self.startz = float(startz) if startz is not None else  self.app.defaults["geometry_startz"]
         self.z_end = float(endz) if endz is not None else  self.app.defaults["geometry_endz"]
 
-        self.xy_end = re.sub('[()\[\]]', '', str(endxy)) if endxy else  self.app.defaults["geometry_endxy"]
+        self.xy_end = re.sub(r'[()\[\]]', '', str(endxy)) if endxy else  self.app.defaults["geometry_endxy"]
 
         if self.xy_end and self.xy_end != '':
             self.xy_end = [float(eval(a)) for a in self.xy_end.split(",")]
@@ -5328,7 +5328,7 @@ class CNCjob(Geometry):
             if toolchangexy == '':
                 self.xy_toolchange = None
             else:
-                self.xy_toolchange = re.sub('[()\[\]]', '', str(toolchangexy)) \
+                self.xy_toolchange = re.sub(r'[()\[\]]', '', str(toolchangexy)) \
                     if toolchangexy else self.app.defaults["geometry_toolchangexy"]
 
                 if self.xy_toolchange and self.xy_toolchange != '':
@@ -5705,7 +5705,7 @@ class CNCjob(Geometry):
         self.z_end = float(endz) if endz is not None else self.app.defaults["geometry_endz"]
 
         self.xy_end = endxy if endxy != '' and endxy else self.app.defaults["geometry_endxy"]
-        self.xy_end = re.sub('[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
+        self.xy_end = re.sub(r'[()\[\]]', '', str(self.xy_end)) if self.xy_end else None
 
         if self.xy_end is not None and self.xy_end != '':
             self.xy_end = [float(eval(a)) for a in self.xy_end.split(",")]
@@ -5725,7 +5725,7 @@ class CNCjob(Geometry):
             if toolchangexy == '':
                 self.xy_toolchange = None
             else:
-                self.xy_toolchange = re.sub('[()\[\]]', '', str(toolchangexy)) if self.xy_toolchange else None
+                self.xy_toolchange = re.sub(r'[()\[\]]', '', str(toolchangexy)) if self.xy_toolchange else None
 
                 if self.xy_toolchange and self.xy_toolchange != '':
                     self.xy_toolchange = [float(eval(a)) for a in self.xy_toolchange.split(",")]

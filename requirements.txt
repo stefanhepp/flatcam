@@ -14,11 +14,12 @@ setuptools
 dill
 rtree
 pyopengl
-vispy
+vispy==0.9.0
 ortools>=7.0
 svg.path>=4.0
 simplejson
-shapely>=1.7.0
+# Newer versions of shapely do not seem to work
+shapely==1.7.0
 freetype-py
 fontTools
 rasterio
@@ -27,5 +28,7 @@ ezdxf
 qrcode>=6.1
 reportlab>=3.5
 svglib
-gdal
+# Is GDAL really needed?
+# gdal
 pyserial>=3.4
+pywin32 ; sys_platform == "win32"

@@ -2478,7 +2478,7 @@ class GeometryObject(FlatCAMObj, Geometry):
 
         endxy = endxy if endxy else self.options["endxy"]
         if isinstance(endxy, str):
-            endxy = re.sub('[()\[\]]', '', endxy)
+            endxy = re.sub(r'[()\[\]]', '', endxy)
             if endxy and endxy != '':
                 endxy = [float(eval(a)) for a in endxy.split(",")]
 
@@ -2486,7 +2486,7 @@ class GeometryObject(FlatCAMObj, Geometry):
 
         toolchangexy = toolchangexy if toolchangexy else self.options["toolchangexy"]
         if isinstance(toolchangexy, str):
-            toolchangexy = re.sub('[()\[\]]', '', toolchangexy)
+            toolchangexy = re.sub(r'[()\[\]]', '', toolchangexy)
             if toolchangexy and toolchangexy != '':
                 toolchangexy = [float(eval(a)) for a in toolchangexy.split(",")]
 
@@ -3333,7 +3333,7 @@ class GeometryObject(FlatCAMObj, Geometry):
                 if type(o) == MultiPolygon:
                     for poly in o:
                         pts += GeometryObject.get_pts(poly)
-                # ## Descend into .exerior and .interiors
+                # ## Descend into .exterior and .interiors
                 elif type(o) == Polygon:
                     pts += GeometryObject.get_pts(o.exterior)
                     for i in o.interiors:
