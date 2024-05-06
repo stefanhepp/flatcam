@@ -4605,7 +4605,8 @@ class App(QtCore.QObject):
 
         # work only if the notebook tab on focus is the properties_tab and only if the object is Geometry
         if notebook_widget_name == 'properties_tab':
-            if self.collection.get_active().kind == 'geometry':
+            active = self.collection.get_active()
+            if active and active.kind == 'geometry':
                 # Tool add works for Geometry only if Advanced is True in Preferences
                 if self.defaults["global_app_level"] == 'a':
                     tool_add_popup = FCInputSpinner(title='%s...' % _("New Tool"),
