@@ -1664,11 +1664,25 @@ class ToolsDB2(QtWidgets.QWidget):
 
         # sep = menu.addSeparator()
 
+        sort_db = menu.addAction(QtGui.QIcon(self.app.resource_location + '/save_as.png'), _("Sort DB"))
+        sort_db.triggered.connect(self.on_sort_db)
+
         save_changes = menu.addAction(QtGui.QIcon(self.app.resource_location + '/save_as.png'), _("Save changes"))
         save_changes.triggered.connect(self.on_save_changes)
 
         # tree_item = self.ui.tree_widget.itemAt(pos)
         menu.exec(self.ui.tree_widget.viewport().mapToGlobal(pos))
+
+    def on_sort_db(self):
+
+        sorted_tools = sorted(self.db_tool_dict.values(), key=lambda data: data["name"])
+
+        self.db_tool_dict = {str(i+1): sorted_tools[i] for i in range(len(sorted_tools))}
+
+        self.update_storage()
+        self.build_db_ui()
+
+        self.on_tools_db_edited()
 
     def on_save_changes(self):
         widget_name = self.app_ui.plot_tab_area.currentWidget().objectName()
