@@ -8,6 +8,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from appTool import AppTool
+from appDatabase import ToolTargets
 from appGUI.GUIElements import FCCheckBox, FCDoubleSpinner, RadioSet, FCTable, FCButton, \
     FCComboBox, OptionalInputSection, FCSpinner, NumericalEvalEntry, OptionalHideInputSection, FCLabel, \
     NumericalEvalTupleEntry
@@ -952,6 +953,11 @@ class ToolDrilling(AppTool, Excellon):
                     db_tooldia = db_tool_val['tooldia']
                     low_limit = float(db_tool_val['data']['tol_min'])
                     high_limit = float(db_tool_val['data']['tol_max'])
+                    tool_target = db_tool_val['data']['tool_target']
+
+                    # Only use drilling tools
+                    if tool_target != ToolTargets.GENERAL.value and tool_target != ToolTargets.DRILLING.value:
+                        continue
 
                     # if we find a tool with the same diameter in the Tools DB just update it's data
                     if orig_tooldia == db_tooldia:

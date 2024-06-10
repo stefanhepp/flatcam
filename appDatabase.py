@@ -8,6 +8,7 @@ import json
 
 from copy import deepcopy
 from datetime import datetime
+from enum import Enum
 import math
 
 import gettext
@@ -18,6 +19,15 @@ fcTranslate.apply_language('strings')
 if '_' not in builtins.__dict__:
     _ = gettext.gettext
 
+
+class ToolTargets(Enum):
+    GENERAL = 0
+    MILLING = 1
+    DRILLING = 2
+    ISOLATION = 3
+    PAINT = 4
+    NCC = 5
+    CUTOUT = 6
 
 class ToolsDB2UI:
     
@@ -1818,7 +1828,7 @@ class ToolsDB2(QtWidgets.QWidget):
 
         self.ui.tool_description_box.setEnabled(True)
         if self.db_tool_dict:
-            if tool_target == 0:    # _("General")
+            if tool_target == ToolTargets.GENERAL.value:    # _("General")
                 self.ui.milling_box.setEnabled(True)
                 self.ui.ncc_box.setEnabled(True)
                 self.ui.paint_box.setEnabled(True)
@@ -1840,33 +1850,33 @@ class ToolsDB2(QtWidgets.QWidget):
                 self.ui.drill_box.hide()
                 self.ui.cutout_box.hide()
 
-                if tool_target == 1:    # _("Milling")
+                if tool_target == ToolTargets.MILLING.value:    # _("Milling")
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 2:    # _("Drilling")
+                if tool_target == ToolTargets.DRILLING.value:    # _("Drilling")
                     self.ui.drill_box.setEnabled(True)
                     self.ui.drill_box.show()
 
-                if tool_target == 3:    # _("Isolation")
+                if tool_target == ToolTargets.ISOLATION.value:    # _("Isolation")
                     self.ui.iso_box.setEnabled(True)
                     self.ui.iso_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 4:    # _("Paint")
+                if tool_target == ToolTargets.PAINT.value:    # _("Paint")
                     self.ui.paint_box.setEnabled(True)
                     self.ui.paint_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 5:    # _("NCC")
+                if tool_target == ToolTargets.NCC.value:    # _("NCC")
                     self.ui.ncc_box.setEnabled(True)
                     self.ui.ncc_box.show()
                     self.ui.milling_box.setEnabled(True)
                     self.ui.milling_box.show()
 
-                if tool_target == 6:    # _("Cutout")
+                if tool_target == ToolTargets.CUTOUT.value:    # _("Cutout")
                     self.ui.cutout_box.setEnabled(True)
                     self.ui.cutout_box.show()
                     self.ui.milling_box.setEnabled(True)
@@ -1881,7 +1891,7 @@ class ToolsDB2(QtWidgets.QWidget):
         default_data = {}
         default_data.update({
             "plot":             True,
-            "tool_target": 0,   # _("General")
+            "tool_target": ToolTargets.GENERAL.value,   # _("General")
             "tol_min": 0.0,
             "tol_max": 0.0,
 
@@ -2188,15 +2198,15 @@ class ToolsDB2(QtWidgets.QWidget):
 
                 # clean the dictionary and leave only keys of interest
                 for tool_id in self.db_tool_dict.keys():
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] != _('General'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] != ToolTargets.GENERAL.value:
                         continue
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Milling'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.MILLING.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 self.db_tool_dict[tool_id]['data'].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Drilling'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.DRILLING.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 if str(k).startswith('tools_drill') or str(k).startswith('tools_mill'):
@@ -2204,7 +2214,7 @@ class ToolsDB2(QtWidgets.QWidget):
                                 else:
                                     self.db_tool_dict[tool_id]['data'].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Isolation'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.ISOLATION.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 if str(k).startswith('tools_iso') or str(k).startswith('tools_mill'):
@@ -2212,7 +2222,7 @@ class ToolsDB2(QtWidgets.QWidget):
                                 else:
                                     self.db_tool_dict[tool_id]['data'].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Paint'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.PAINT.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 if str(k).startswith('tools_paint') or str(k).startswith('tools_mill'):
@@ -2220,7 +2230,7 @@ class ToolsDB2(QtWidgets.QWidget):
                                 else:
                                     self.db_tool_dict[tool_id]['data'].pop(k, None)
                                     
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('NCC'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.NCC.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 if str(k).startswith('tools_ncc') or str(k).startswith('tools_mill'):
@@ -2228,7 +2238,7 @@ class ToolsDB2(QtWidgets.QWidget):
                                 else:
                                     self.db_tool_dict[tool_id]['data'].pop(k, None)
 
-                    if self.db_tool_dict[tool_id]['data']['tool_target'] == _('Cutout'):
+                    if self.db_tool_dict[tool_id]['data']['tool_target'] == ToolTargets.CUTOUT.value:
                         for k in list(self.db_tool_dict[tool_id]['data'].keys()):
                             if str(k).startswith('tools_'):
                                 if str(k).startswith('tools_cutout') or str(k).startswith('tools_mill'):
