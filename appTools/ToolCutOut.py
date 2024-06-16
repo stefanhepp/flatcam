@@ -914,6 +914,10 @@ class CutOut(AppTool):
 
             self.app.worker_task.emit({'fcn': job_thread, 'params': [self.app]})
 
+        # Switch notebook to Properties page
+        self.app.ui.notebook.setCurrentWidget(self.app.ui.properties_tab)
+
+
     def on_rectangular_cutout(self):
         log.debug("Cutout.on_rectangular_cutout() was launched ...")
 

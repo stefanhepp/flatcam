@@ -424,6 +424,7 @@ class GeometryObject(FlatCAMObj, Geometry):
         for it in range(self.ui.pp_geometry_name_cb.count()):
             self.ui.pp_geometry_name_cb.setItemData(
                 it, self.ui.pp_geometry_name_cb.itemText(it), QtCore.Qt.ToolTipRole)
+        self.ui.pp_geometry_name_cb.set_value(self.app.defaults["geometry_ppname_g"])
 
         self.form_fields.update({
             "plot": self.ui.plot_cb,
@@ -485,7 +486,7 @@ class GeometryObject(FlatCAMObj, Geometry):
         self.to_form()
 
         # update the changes in UI depending on the selected preprocessor in Preferences
-        # after this moment all the changes in the Posprocessor combo will be handled by the activated signal of the
+        # after this moment all the changes in the Postprocessor combo will be handled by the activated signal of the
         # self.ui.pp_geometry_name_cb combobox
         self.on_pp_changed()
 

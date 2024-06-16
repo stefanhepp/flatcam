@@ -275,10 +275,12 @@ class ToolMilling(AppTool, Excellon):
             if name == 'hpgl':
                 continue
             self.ui.pp_excellon_name_cb.addItem(name)
+        self.ui.pp_excellon_name_cb.set_value(self.app.defaults["tools_drill_ppname_e"])
 
         # populate Geometry (milling) preprocessor combobox list
         for name in list(self.app.preprocessors.keys()):
             self.ui.pp_geo_name_cb.addItem(name)
+        self.ui.pp_geo_name_cb.set_value(self.app.defaults["geometry_ppname_g"])
 
         # Fill form fields
         # self.to_form()

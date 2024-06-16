@@ -151,7 +151,7 @@ M5
 G00 Z{z_toolchange}
 G00 X{x_toolchange} Y{y_toolchange}                
 T{tool}
-M6
+M6 ;Dia = {toolC}
 (MSG, Change to Tool Dia = {toolC} ||| Total drills for tool T{tool} = {t_drills})
 M0
 G00 Z{z_toolchange}
@@ -166,7 +166,7 @@ G00 Z{z_toolchange}
 M5             
 G00 Z{z_toolchange}               
 T{tool}
-M6
+M6 ;Dia = {toolC}
 (MSG, Change to Tool Dia = {toolC} ||| Total drills for tool T{tool} = {t_drills})
 M0
 G00 Z{z_toolchange}
@@ -186,7 +186,7 @@ M5
 G00 Z{z_toolchange}
 G00 X{x_toolchange} Y{y_toolchange}                
 T{tool}
-M6
+M6 ;Dia = {toolC}
 (MSG, Change to Tool Dia = {toolC})
 M0
 G00 Z{z_toolchange}

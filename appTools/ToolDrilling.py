@@ -295,9 +295,10 @@ class ToolDrilling(AppTool, Excellon):
         for it in range(self.t_ui.pp_excellon_name_cb.count()):
             self.t_ui.pp_excellon_name_cb.setItemData(
                 it, self.t_ui.pp_excellon_name_cb.itemText(it), QtCore.Qt.ToolTipRole)
+        self.t_ui.pp_excellon_name_cb.set_value(self.app.defaults["tools_drill_ppname_e"])
 
         # update the changes in UI depending on the selected preprocessor in Preferences
-        # after this moment all the changes in the Posprocessor combo will be handled by the activated signal of the
+        # after this moment all the changes in the Postprocessor combo will be handled by the activated signal of the
         # self.t_ui.pp_excellon_name_cb combobox
         self.on_pp_changed()
 
