@@ -938,6 +938,46 @@ class ToolDrilling(AppTool, Excellon):
 
         self.replace_tools()
 
+    def find_tools(self, tool_data, tooldia, tool_type):
+        tool_found = 0
+
+        # look in database tools
+        for db_tool, db_tool_val in self.tools_db_dict.items():
+            db_tooldia = db_tool_val['tooldia']
+            low_limit = float(db_tool_val['data']['tol_min'])
+            high_limit = float(db_tool_val['data']['tol_max'])
+            tool_target = db_tool_val['data']['tool_target']
+
+            # Only use drilling tools
+            if tool_target != tool_type:
+                continue
+
+            # if we find a tool with the same diameter in the Tools DB just update it's data
+            if tooldia == db_tooldia:
+                tool_found += 1
+                for d in db_tool_val['data']:
+                    if d.find('tools_drill') == 0:
+                        tool_data['data'][d] = db_tool_val['data'][d]
+                    elif d.find('tools_') == 0:
+                        # don't need data for other App Tools; this tests after 'tools_drill_'
+                        continue
+                    else:
+                        tool_data['data'][d] = db_tool_val['data'][d]
+            # search for a tool that has a tolerance that the tool fits in
+            elif high_limit >= tooldia >= low_limit:
+                tool_found += 1
+                tool_data['tooldia'] = db_tooldia
+                for d in db_tool_val['data']:
+                    if d.find('tools_drill') == 0:
+                        tool_data['data'][d] = db_tool_val['data'][d]
+                    elif d.find('tools_') == 0:
+                        # don't need data for other App Tools; this tests after 'tools_drill_'
+                        continue
+                    else:
+                        tool_data['data'][d] = db_tool_val['data'][d]
+
+        return tool_found
+
     def replace_tools(self):
         log.debug("ToolDrilling.replace_tools()")
 
@@ -947,42 +987,8 @@ class ToolDrilling(AppTool, Excellon):
             for orig_tool, orig_tool_val in self.excellon_tools.items():
                 orig_tooldia = orig_tool_val['tooldia']
 
-                tool_found = 0
-
-                # look in database tools
-                for db_tool, db_tool_val in self.tools_db_dict.items():
-                    db_tooldia = db_tool_val['tooldia']
-                    low_limit = float(db_tool_val['data']['tol_min'])
-                    high_limit = float(db_tool_val['data']['tol_max'])
-                    tool_target = db_tool_val['data']['tool_target']
-
-                    # Only use drilling tools
-                    if tool_target != ToolTargets.GENERAL.value and tool_target != ToolTargets.DRILLING.value:
-                        continue
-
-                    # if we find a tool with the same diameter in the Tools DB just update it's data
-                    if orig_tooldia == db_tooldia:
-                        tool_found += 1
-                        for d in db_tool_val['data']:
-                            if d.find('tools_drill') == 0:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
-                            elif d.find('tools_') == 0:
-                                # don't need data for other App Tools; this tests after 'tools_drill_'
-                                continue
-                            else:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
-                    # search for a tool that has a tolerance that the tool fits in
-                    elif high_limit >= orig_tooldia >= low_limit:
-                        tool_found += 1
-                        new_tools_dict[orig_tool]['tooldia'] = db_tooldia
-                        for d in db_tool_val['data']:
-                            if d.find('tools_drill') == 0:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
-                            elif d.find('tools_') == 0:
-                                # don't need data for other App Tools; this tests after 'tools_drill_'
-                                continue
-                            else:
-                                new_tools_dict[orig_tool]['data'][d] = db_tool_val['data'][d]
+                # Search for drilling tools only first
+                tool_found = self.find_tools(new_tools_dict[orig_tool], orig_tooldia, ToolTargets.DRILLING.value)
 
                 if tool_found > 1:
                     self.app.inform.emit(
@@ -990,6 +996,17 @@ class ToolDrilling(AppTool, Excellon):
                                                  "Multiple tools for one tool diameter found in Tools Database."))
                     self.blockSignals(False)
                     return
+
+                # If no drilling tool was found, use a general tool
+                if tool_found == 0:
+                    tool_found = self.find_tools(new_tools_dict[orig_tool], orig_tooldia, ToolTargets.GENERAL.value)
+
+                    if tool_found > 1:
+                        self.app.inform.emit(
+                            '[WARNING_NOTCL] %s' % _("Cancelled.\n"
+                                                     "Multiple tools for one tool diameter found in Tools Database."))
+                        self.blockSignals(False)
+                        return
 
             self.excellon_tools = new_tools_dict
             self.build_tool_ui()
