@@ -15,37 +15,35 @@ sudo apt-get install -y \
 	python3-pyqt5 \
 	python3-pyqt5.qtopengl \
 	python3-simplejson \
-	python3-tk
+	python3-tk \
+	python3-svglib \
+	python3-vispy \
+	python3-reportlab \
+	python3-numpy \
+	python3-opengl \
+	python3-rtree \
+	python3-lxml \
+	python3-qrcode \
+	python3-matplotlib \
+	python3-rasterio \
+	python3-dill \
+	python3-cycler \
+	python3-ezdxf \
+	python3-svg.path \
+	python3-fonttools \
+	python3-kiwisolver \
+	python3-setuptools \
+	python3-dateutil \
+	python3-testresources \
+	python3-freetype \
+	python3-serial
 
 
 # Python packages
 
-sudo -H python3 -m pip install --upgrade \
+python3 -m pip install --upgrade --user --break-system-packages \
 	pip \
-	numpy \
-	shapely \
-	rtree \
-	tk \
-	lxml \
-	cycler \
-	python-dateutil \
-	kiwisolver \
-	dill \
-	vispy \
-	pyopengl \
-	setuptools \
-	svg.path \
 	ortools \
-	freetype-py \
-	fontTools \
-	rasterio \
-	ezdxf \
-	matplotlib \
-	qrcode \
-	pyqt5 \
-	reportlab \
-	svglib \
-	pyserial \
-	testresources
+	shapely==1.7.0
 
 sudo -H easy_install -U distribute
