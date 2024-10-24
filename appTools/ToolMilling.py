@@ -1406,7 +1406,7 @@ class ToolMilling(AppTool, Excellon):
             job_obj.excellon_optimization_type = self.app.defaults["excellon_optimization_type"]
 
             tools_csv = ','.join(tools)
-            ret_val = job_obj.generate_from_excellon_by_tool(self, tools_csv, use_ui=True)
+            ret_val = job_obj.generate_from_excellon_by_tool(self, tools_csv, use_ui=True, is_first=True)
 
             if ret_val == 'fail':
                 return 'fail'

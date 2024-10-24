@@ -1716,6 +1716,9 @@ class GeometryObject(FlatCAMObj, Geometry):
         if row < 0:
             row = 0
 
+        # Make sure to update the tools with the values from the UI, so the values exist in the tools data
+        self.update_common_param_in_storage()
+
         # store all the data associated with the row parameter to the self.tools storage
         tooldia_item = float(self.ui.geo_tools_table.item(row, 1).text())
         offset_item = self.ui.geo_tools_table.cellWidget(row, 2).currentText()
@@ -1995,6 +1998,7 @@ class GeometryObject(FlatCAMObj, Geometry):
 
         # this reads the values in the UI form to the self.options dictionary
         self.read_form()
+        self.update_common_param_in_storage()
 
         self.sel_tools = {}
 

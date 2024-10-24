@@ -3607,9 +3607,7 @@ class CNCjob(Geometry):
         self.dwell = tool_dict['dwell']
         self.dwelltime = float(tool_dict['dwelltime'])
 
-        self.startz = float(tool_dict['startz']) if tool_dict['startz'] else None
-        if self.startz == '':
-            self.startz = None
+        self.startz = float(tool_dict['startz']) if 'startz' in tool_dict and tool_dict['startz'] else None
 
         self.z_end = float(tool_dict['endz'])
         self.xy_end = tool_dict['endxy']
@@ -3632,7 +3630,7 @@ class CNCjob(Geometry):
             self.xy_end = [0, 0]
 
         self.z_toolchange = tool_dict['toolchangez']
-        self.xy_toolchange = tool_dict["toolchangexy"]
+        self.xy_toolchange = tool_dict["toolchangexy"] if 'toolchangexy' in tool_dict else None
         try:
             if self.xy_toolchange == '':
                 self.xy_toolchange = None

@@ -334,7 +334,7 @@ class TclCommandDrillcncjob(TclCommandSignaled):
             job_obj.excellon_optimization_type = opt_type
             job_obj.spindledir = self.app.defaults["tools_drill_spindledir"]
 
-            ret_val = job_obj.generate_from_excellon_by_tool(obj, tools, use_ui=False)
+            ret_val = job_obj.generate_from_excellon_by_tool(obj, tools, use_ui=False, is_first=True)
             job_obj.source_file = ret_val
 
             if ret_val == 'fail':
